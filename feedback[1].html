@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GewitterKompass – BlitzCrew Feedback</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(180deg,#e8f6fb,#f3f8ed);color:#102733}
+main{width:min(100%,760px);margin:auto;padding:18px}.card{background:#fff;border-radius:22px;padding:20px;box-shadow:0 12px 32px rgba(30,74,95,.17)}
+h1{margin-top:0;font-size:clamp(28px,7vw,42px)}label{display:block;margin:16px 0 6px;font-weight:800}
+input,textarea,select{width:100%;padding:12px;border:1px solid #9fb5c0;border-radius:12px;font-size:16px}
+textarea{min-height:96px;resize:vertical}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.check{display:flex;align-items:center;gap:9px;margin:10px 0;font-weight:normal}.check input{width:22px;height:22px}
+button,a{display:block;width:100%;margin-top:14px;padding:15px;border:0;border-radius:14px;text-align:center;text-decoration:none;font-size:17px;font-weight:900}
+button{background:#477d00;color:#fff}a{background:#155d83;color:#fff}.note{padding:12px;border-radius:13px;background:#eaf5fb;line-height:1.45}
+@media(max-width:540px){.row{grid-template-columns:1fr}}@media print{button,a,.note{display:none}.card{box-shadow:none}}
+</style>
+</head>
+<body><main><section class="card">
+<h1>⚡ BlitzCrew Feedback</h1>
+<p class="note">Zum Weitergeben bitte im Browser „Drucken“ und anschließend „Als PDF speichern“ wählen.</p>
+<div class="row"><div><label>Name (freiwillig)</label><input></div><div><label>Testdatum</label><input type="date"></div></div>
+<label>Gerät und Browser</label><input placeholder="z. B. Samsung Galaxy A52 / Chrome">
+<label>Was war sofort verständlich?</label><textarea></textarea>
+<label>Wo gab es Schwierigkeiten?</label><textarea></textarea>
+<label>Gesamtbewertung</label>
+<select><option>★★★★★ Sehr gut</option><option>★★★★☆ Gut</option><option>★★★☆☆ Befriedigend</option><option>★★☆☆☆ Verbesserungsbedürftig</option><option>★☆☆☆☆ Nicht ausreichend</option></select>
+<label>Funktionsprüfung</label>
+<label class="check"><input type="checkbox"> Willkommensseite verständlich</label>
+<label class="check"><input type="checkbox"> Sicherheits- & HandyCheck verständlich</label>
+<label class="check"><input type="checkbox"> Ampel schaltet bei 5/5 auf Grün</label>
+<label class="check"><input type="checkbox"> Standortfreigabe und GPS funktionieren</label>
+<label class="check"><input type="checkbox"> Blitz-/Donner-Messung funktioniert</label>
+<label class="check"><input type="checkbox"> Karte und Rückkehr funktionieren</label>
+<label class="check"><input type="checkbox"> Sicherheitshinweise und Notruf verständlich</label>
+<label>Mein wichtigster Verbesserungsvorschlag</label><textarea></textarea>
+<button onclick="window.print()">🖨 Feedback drucken / als PDF speichern</button>
+<a href="index.html">⬅ Zurück zum GewitterKompass</a>
+</section></main></body></html>
