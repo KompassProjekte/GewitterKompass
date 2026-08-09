@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b2f49">
+<title>GewitterKompass installieren</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GewitterKompass">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif}
+body{
+  color:#fff;
+  background:
+    radial-gradient(circle at 20% 0%,rgba(255,255,255,.16),transparent 30%),
+    linear-gradient(160deg,#5f91b1 0%,#315f7d 43%,#09283e 100%);
+}
+main{width:min(100%,720px);margin:auto;padding:22px 18px 36px}
+.hero{text-align:center;padding:10px 8px 18px}
+.logo{width:128px;height:128px;object-fit:contain;filter:drop-shadow(0 12px 18px rgba(0,0,0,.25))}
+h1{font-size:clamp(35px,9vw,58px);line-height:1;margin:8px 0 10px}
+.claim{font-size:clamp(17px,4vw,24px);font-weight:900;color:#ffd34d;margin:0}
+.card{background:rgba(255,255,255,.94);color:#102b3c;border-radius:24px;padding:20px;box-shadow:0 18px 48px rgba(0,0,0,.24)}
+.intro{text-align:center;font-size:18px;line-height:1.45;margin:2px 0 17px}
+.btn{width:100%;border:0;border-radius:17px;padding:18px 14px;margin:10px 0;font-size:19px;font-weight:900;cursor:pointer}
+.install{background:linear-gradient(145deg,#8bd100,#4b8700);color:#fff;box-shadow:0 8px 22px rgba(76,135,0,.28)}
+.home{background:#155f87;color:#fff}
+.start{background:#e9f0f4;color:#103047;border:2px solid #9bb5c4}
+.btn[hidden]{display:none}
+.note{margin-top:14px;background:#eef5f8;border-radius:14px;padding:13px;line-height:1.45;font-size:15px}
+.status{margin:12px 0 0;text-align:center;font-weight:800;min-height:24px}
+.steps{margin-top:13px;font-size:15px;line-height:1.5}
+.small{font-size:12px;color:#476170;margin-top:15px;text-align:center}
+.badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:14px 0}
+.badges span{background:#e7f0f4;padding:7px 10px;border-radius:999px;font-weight:800;font-size:12px}
+</style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <img class="logo" src="./icons/icon-512.png" alt="GewitterKompass Logo">
+    <h1>GewitterKompass</h1>
+    <p class="claim">Blitz sehen. Donner hören. Sicher handeln.</p>
+  </section>
+
+  <section class="card">
+    <p class="intro">
+      Willkommen beim GewitterKompass.<br>
+      Installieren Sie ihn als App auf Ihrem Smartphone oder starten Sie ihn direkt im Browser.
+    </p>
+
+    <div class="badges">
+      <span>KOSTENLOS</span><span>KEINE ANMELDUNG</span><span>6.0 FINAL</span>
+    </div>
+
+    <button id="installBtn" class="btn install" hidden>📱 GEWITTERKOMPASS INSTALLIEREN</button>
+    <button id="homeBtn" class="btn home">➕ ZUM STARTBILDSCHIRM HINZUFÜGEN</button>
+    <button id="startBtn" class="btn start">▶ OHNE INSTALLATION STARTEN</button>
+
+    <div id="status" class="status"></div>
+    <div id="help" class="note">
+      <strong>Installation:</strong><br>
+      Android/Chrome: Browser-Menü öffnen und „App installieren“ oder „Zum Startbildschirm hinzufügen“ wählen.<br><br>
+      iPhone/iPad/Safari: „Teilen“ antippen und anschließend „Zum Home-Bildschirm“ wählen.
+    </div>
+
+    <div class="steps">
+      <strong>Danach:</strong> Das GewitterKompass-Symbol erscheint auf dem Startbildschirm bzw. in der App-Übersicht. Von dort kann die App direkt gestartet werden.
+    </div>
+
+    <p class="small">
+      Der GewitterKompass unterstützt die persönliche Orientierung bei Gewitter und ersetzt keine amtlichen Wetterwarnungen.
+    </p>
+  </section>
+</main>
+<script>
+let deferredPrompt = null;
+const installBtn = document.getElementById('installBtn');
+const homeBtn = document.getElementById('homeBtn');
+const startBtn = document.getElementById('startBtn');
+const status = document.getElementById('status');
+const help = document.getElementById('help');
+
+const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+if (standalone) {
+  installBtn.hidden = true;
+  homeBtn.hidden = true;
+  status.textContent = '✓ GewitterKompass ist bereits als App geöffnet.';
+}
+
+window.addEventListener('beforeinstallprompt', (event) => {
+  event.preventDefault();
+  deferredPrompt = event;
+  installBtn.hidden = false;
+  status.textContent = 'Die direkte App-Installation ist auf diesem Gerät verfügbar.';
+});
+
+installBtn.addEventListener('click', async () => {
+  if (!deferredPrompt) {
+    status.textContent = 'Bitte verwenden Sie die Anleitung „Zum Startbildschirm hinzufügen“.';
+    return;
+  }
+  deferredPrompt.prompt();
+  const choice = await deferredPrompt.userChoice;
+  if (choice.outcome === 'accepted') {
+    status.textContent = '✓ Installation bestätigt.';
+  } else {
+    status.textContent = 'Installation wurde nicht durchgeführt.';
+  }
+  deferredPrompt = null;
+  installBtn.hidden = true;
+});
+
+homeBtn.addEventListener('click', () => {
+  const ua = navigator.userAgent || '';
+  const isiOS = /iphone|ipad|ipod/i.test(ua);
+  if (isiOS) {
+    help.innerHTML = '<strong>iPhone/iPad:</strong><br>Tippen Sie in Safari auf <b>Teilen</b> und danach auf <b>Zum Home-Bildschirm</b>.';
+  } else {
+    help.innerHTML = '<strong>Android:</strong><br>Öffnen Sie das Browser-Menü. Wählen Sie <b>App installieren</b>, <b>Zum Startbildschirm hinzufügen</b> oder - falls nur diese Möglichkeit angeboten wird - <b>Verknüpfung erstellen</b>.';
+  }
+  help.scrollIntoView({behavior:'smooth', block:'center'});
+});
+
+startBtn.addEventListener('click', () => location.href = './index.html');
+
+window.addEventListener('appinstalled', () => {
+  status.textContent = '✓ GewitterKompass wurde installiert.';
+  installBtn.hidden = true;
+});
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
