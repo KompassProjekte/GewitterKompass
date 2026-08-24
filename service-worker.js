@@ -1,39 +1,69 @@
-const CACHE = 'gewitterkompass-6-0-final-install-v2';
-const CORE = [
-  './',
-  './index.html',
-  './install.html',
-  './manifest.json',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
-  './icons/icon-1024.png',
-  './icons/apple-touch-icon.png',
-  './icons/favicon.png'
+const CACHE = 'mein-begleiter-handy-einfachmodus-cache-v1-8-6-2';
+const BASIS = '/Mein-Begleiter-Handy-Einfachmodus-Test/';
+const PFLICHTDATEIEN = [
+  BASIS,
+  BASIS + 'index.html',
+  BASIS + 'manifest.webmanifest',
+  BASIS + 'offline.html'
+];
+const OPTIONALE_DATEIEN = [
+  BASIS + 'icons/icon-192.png',
+  BASIS + 'icons/icon-512.png',
+  BASIS + 'icons/icon-maskable-512.png',
+  BASIS + 'icons/apple-touch-icon-180.png',
+  BASIS + 'icons/favicon-64.png'
 ];
 
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(CORE)));
-  self.skipWaiting();
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE);
+    await cache.addAll(PFLICHTDATEIEN);
+    await Promise.allSettled(OPTIONALE_DATEIEN.map(datei => cache.add(datei)));
+  })());
 });
 
 self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key)))
-    )
-  );
-  self.clients.claim();
+  event.waitUntil((async () => {
+    const namen = await caches.keys();
+    await Promise.all(namen
+      .filter(name => name.startsWith('mein-begleiter-handy-einfachmodus-cache') && name !== CACHE)
+      .map(name => caches.delete(name)));
+    await self.clients.claim();
+  })());
+});
+
+self.addEventListener('message', event => {
+  if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
-  event.respondWith(
-    fetch(event.request).then(response => {
-      const copy = response.clone();
-      caches.open(CACHE).then(cache => cache.put(event.request, copy));
-      return response;
-    }).catch(() =>
-      caches.match(event.request).then(cached => cached || caches.match('./index.html'))
-    )
-  );
+  const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin || !url.pathname.startsWith(BASIS)) return;
+
+  if (event.request.mode === 'navigate') {
+    event.respondWith((async () => {
+      try {
+        const antwort = await fetch(event.request);
+        const cache = await caches.open(CACHE);
+        cache.put(BASIS + 'index.html', antwort.clone());
+        return antwort;
+      } catch {
+        return (await caches.match(BASIS + 'index.html')) ||
+          (await caches.match(BASIS + 'offline.html'));
+      }
+    })());
+    return;
+  }
+
+  event.respondWith((async () => {
+    const gespeichert = await caches.match(event.request);
+    if (gespeichert) return gespeichert;
+    const antwort = await fetch(event.request);
+    if (antwort.ok) {
+      const cache = await caches.open(CACHE);
+      cache.put(event.request, antwort.clone());
+    }
+    return antwort;
+  })());
 });
